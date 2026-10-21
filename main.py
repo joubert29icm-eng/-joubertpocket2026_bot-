@@ -1,37 +1,33 @@
+import os
 from flask import Flask
-import threading, os, asyncio, random
-from datetime import datetime, timezone
-import telegram
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
+import threading
 
 app = Flask(__name__)
-@app.route('/')
-def home(): return "Bot Online - Deus é fiel!"
-def run_web(): app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
-threading.Thread(target=run_web).start()
 
-PARES_FOREX_REAL = [
-    "EUR/USD","GBP/USD","USD/JPY","AUD/USD","USD/CAD",
-    "EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY","EUR/AUD",
-    "NZD/USD","USD/CHF","EUR/CHF","GBP/CHF","EUR/CAD"
-]
+@app.route("/")
+def oi():
+    return "Bot Online - Deus e fiel - Joubert Pocket 2026"
 
-FICHA = os.getenv("TELEGRAM_BOT_TOKEN")
-ID_DO_CHAT = os.getenv("ID_DO_CHAT_DO_TELEGRAM")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-async def enviar():
-    if not FICHA or not ID_DO_CHAT:
-        print("Aguardando TOKEN...")
-        return
-    bot = telegram.Bot(token=FICHA)
-    while True:
-        par = random.choice(PARES_FOREX_REAL)
-        agora = datetime.now(timezone.utc)
-        msg = f"🔥 SINAL POCKET 2026 🔥\n\nPar: {par}\nHorário: {agora.strftime('%H:%M')} UTC\n\nDeus é fiel! 🙏"
-        try:
-            await bot.send_message(chat_id=ID_DO_CHAT, text=msg)
-        except Exception as e:
-            print(e)
-        await asyncio.sleep(300)
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("🙏 Deus e fiel! Bot Joubert Pocket 2026 ONLINE! Vitória, Pai!")
+
+def rodar_flask():
+    porta = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=porta)
+
+def main():
+    # Roda o site em segundo plano
+    threading.Thread(target=rodar_flask, daemon=True).start()
+    
+    # Roda o bot do Telegram
+    application = Application.builder().token(TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    print("Bot iniciado! Aguardando /start")
+    application.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(enviar())
+    main()
