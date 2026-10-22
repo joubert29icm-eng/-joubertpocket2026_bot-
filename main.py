@@ -1,4 +1,3 @@
-
 import os
 import threading
 from flask import Flask
@@ -20,12 +19,9 @@ def run_flask():
     app.run(host='0.0.0.0', port=port)
 
 if __name__ == '__main__':
-    # Roda o site numa thread separada
     threading.Thread(target=run_flask, daemon=True).start()
-    
-    # Roda o bot na thread principal - AQUI NÃO DÁ MAIS O ERRO!
     print("INICIANDO O BOT...")
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
-    print("BOT INICIADO COM SUCESSO! VAI PRO TELEGRAM!")
+    print("BOT INICIADO COM SUCESSO!")
     application.run_polling()
