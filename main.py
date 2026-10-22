@@ -1,31 +1,31 @@
-from flask import Flask
+
 import os
 import threading
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from flask import Flask
+from telegram.ext import Application, CommandHandler
+
+TOKEN = os.environ.get("BOT_TOKEN")
 
 app = Flask(__name__)
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-
 @app.route('/')
 def home():
-    return "Bot Joubert ON! - Ta funcionando, so!"
+    return "HELLO WORLD! Bot Joubert is alive!"
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("E ai Joubert! Bot ON! Siga fiel!")
+async def start(update, context):
+    await update.message.reply_text("Olá Joubert! Deus é fiel! Eu estou vivo e funcionando! 🙏")
 
-def run_bot():
-    if not TOKEN:
-        print("FALTA TOKEN!")
-        return
-    application = ApplicationBuilder().token(TOKEN).build()
-    application.add_handler(CommandHandler("start", start))
-    application.run_polling()
-
-# Inicia o bot em segundo plano
-threading.Thread(target=run_bot, daemon=True).start()
-
-if __name__ == '__main__':
+def run_flask():
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
+
+if __name__ == '__main__':
+    # Roda o site numa thread separada
+    threading.Thread(target=run_flask, daemon=True).start()
+    
+    # Roda o bot na thread principal - AQUI NÃO DÁ MAIS O ERRO!
+    print("INICIANDO O BOT...")
+    application = Application.builder().token(TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    print("BOT INICIADO COM SUCESSO! VAI PRO TELEGRAM!")
+    application.run_polling()
