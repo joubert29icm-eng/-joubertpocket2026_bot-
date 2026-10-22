@@ -23,10 +23,8 @@ def run_bot():
     application.add_handler(CommandHandler("start", start))
     application.run_polling()
 
-@app.before_first_request
-def activate_bot():
-    thread = threading.Thread(target=run_bot)
-    thread.start()
+# Inicia o bot em segundo plano
+threading.Thread(target=run_bot, daemon=True).start()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
